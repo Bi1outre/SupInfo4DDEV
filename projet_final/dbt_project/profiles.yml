@@ -1,0 +1,11 @@
+dbt_meteo_mobility_profile:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres
+      port: 5432
+      user: postgres
+      password: postgres
+      dbname: mobility_and_meteo
+      schema: data_warehouse

@@ -1,0 +1,7 @@
+sources:
+  - name: dbt_meteo_mobility
+    database: mobility_and_meteo
+    schema: processed_zone
+    tables:
+      - name: dim_weather
+      - name: fact_taxi_trips

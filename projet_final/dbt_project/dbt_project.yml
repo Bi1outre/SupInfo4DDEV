@@ -1,0 +1,12 @@
+
+name: dbt_meteo_mobility
+profile: dbt_meteo_mobility_profile
+models:
+  dbt-meteo-mobility:
+    # On matérialise les tables pour pouvoir vérifier que ça fonctionne
+    trip_enriched:
+      +materialized: table
+    trip_summary_per_hour:
+      +materialized: table
+    high_value_customers:
+      +materialized: table

@@ -11,11 +11,9 @@ logger = logging.getLogger(__name__)
 
 # Confi Spark
 SPARK_CONFIG = {
-    "master": "spark://spark-master:7077",
+    "master": "local[*]",
     "app_name": "TaxiTransformation",
     "driver_memory": "2G",
-    "executor_memory": "2G",
-    "executor_cores": 2,
     "log_level": "WARN",
 }
 
@@ -23,15 +21,14 @@ OUTPUT_TABLE = "analytics.fact_taxi_trips"
 
 # Session Spark
 def get_spark_session(config):
-    spark = SparkSession.builder \
-        .master(config["master"]) \
-        .appName(config["app_name"]) \
-        .config("spark.driver.memory", config["driver_memory"]) \
-        .config("spark.executor.memory", config["executor_memory"]) \
-        .config("spark.executor.cores", config["executor_cores"]) \
-        .config("spark.jars.packages", "org.postgresql:postgresql:42.5.0") \
+    spark = (
+        SparkSession.builder
+        .master(config["master"])
+        .appName(config["app_name"])
+        .config("spark.driver.memory", config["driver_memory"])
+        .config("spark.jars.packages", "org.postgresql:postgresql:42.5.0")
         .getOrCreate()
-    
+    )
     spark.sparkContext.setLogLevel(config["log_level"])
     return spark
 

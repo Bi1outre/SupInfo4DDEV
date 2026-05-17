@@ -1,18 +1,35 @@
+import subprocess
 from datetime import datetime
-from airflow.sdk import DAG, task
+from airflow.decorators import dag, task
 
-with DAG(dag_id="taxi_dag", start_date=datetime(2026, 5, 5), schedule=None) as dag:
-    
+@dag(
+    dag_id="taxi_dag",
+    start_date=datetime(2026, 5, 1),
+    schedule="@daily",
+    catchup=False,
+    tags=["taxi", "batch"]
+)
+def taxi_dag():
+
     @task()
-    def extract_taxi_trips_data():
-        subprocess.run(["python", "ingestion/taxi_ingest.py"])
-    
+    def ingest_taxi_trips_data():
+        subprocess.run(
+            ["python", "/opt/airflow/dags/projet_final/ingestion/taxi_ingest.py"],
+            check=True
+        )
+
     @task()
     def transform_taxi_trips():
-        subprocess.run(["echo", "Script manquant"]) # A remplacer avec le script de transformation
-    
-    @task()
-    def model_taxi_trips():
-        subprocess.run(["echo", "Script manquant"]) # A remplir avec le script de transformation
+        subprocess.run(
+            ["python", "/opt/airflow/dags/projet_final/transformation/taxi_transform.py"],
+            check=True
+        )
 
-    extract_taxi_trips_data() >> transform_taxi_trips() >> model_taxi_trips()
+    @task()
+    def finalize_taxi_load():
+        subprocess.run(["echo", "Taxi batch terminé"])
+
+    ingest_taxi_trips_data() >> transform_taxi_trips() >> finalize_taxi_load()
+
+
+dag = taxi_dag()

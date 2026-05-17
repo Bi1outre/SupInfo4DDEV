@@ -44,13 +44,15 @@ services:
       retries: 5
 
   airflow-webserver:
-    image: apache/airflow:2.7.3-python3.11
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: airflow_with_flink:latest
+    pull_policy: never
     container_name: airflow_webserver
-    user: "0:0"
     depends_on:
       - airflow-db
       - postgres
-      - minio
     environment:
       AIRFLOW_HOME: /opt/airflow
       AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
@@ -60,7 +62,6 @@ services:
       AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS: "false"
       AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT: "false"
       AIRFLOW_CONN_POSTGRES_DWH: postgresql://postgres:postgres@postgres:5432/mobility_and_meteo
-      AIRFLOW_CONN_MINIO: s3://minioadmin:minioadmin@minio:9000/data
     ports:
       - "8080:8080"
     volumes:
@@ -79,6 +80,7 @@ services:
       airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com &&
       airflow webserver -p 8080
       "
+
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -86,9 +88,12 @@ services:
       retries: 3
 
   airflow-scheduler:
-    image: apache/airflow:2.7.3-python3.11
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: airflow_with_flink:latest
+    pull_policy: never
     container_name: airflow_scheduler
-    user: "0:0"
     depends_on:
       - airflow-db
       - airflow-webserver
@@ -177,7 +182,6 @@ services:
     depends_on:
       - spark-master
       - postgres
-      - minio
     environment:
       SPARK_MASTER: spark://spark-master:7077
       GRANT_SUDO: "yes"
@@ -230,7 +234,6 @@ services:
 
 volumes:
   postgres_data:
-  minio_data:
   airflow_db:
   spark_master_data:
   spark_worker_1_data:

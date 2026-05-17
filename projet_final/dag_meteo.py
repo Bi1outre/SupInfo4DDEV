@@ -1,18 +1,35 @@
+import subprocess
 from datetime import datetime
-from airflow.sdk import DAG, task
+from airflow.decorators import dag, task
 
-with DAG(dag_id="meteo_dag", start_date=datetime(2026, 5, 5), schedule=None) as dag:
-    
-    @task()
-    def extract_meteo_data():
-        subprocess.run(["python", "ingestion/meteo_ingest.py"])
-    
-    @task()
-    def transform_meteo():
-        subprocess.run(["echo", "Script manquant"]) # A remplacer avec le script de transformation
-    
-    @task()
-    def model_meteo():
-        subprocess.run(["echo", "Script manquant"]) # A remplir avec le script de transformation
+@dag(
+    dag_id="meteo_dag",
+    start_date=datetime(2026, 5, 1),
+    schedule="@hourly",
+    catchup=False,
+    tags=["meteo", "streaming"]
+)
+def meteo_dag():
 
-    extract_meteo_data() >> transform_meteo() >> model_meteo()
+    @task()
+    def ingest_meteo_data():
+        subprocess.run(
+            ["python", "/opt/airflow/dags/projet_final/ingestion/meteo_ingest.py"],
+            check=True
+        )
+
+    @task()
+    def transform_meteo_data():
+        subprocess.run(
+            ["python", "/opt/airflow/dags/projet_final/transformation/meteo_transform.py"],
+            check=True
+        )
+
+    @task()
+    def finalize_meteo_load():
+        subprocess.run(["echo", "Météo traité et chargé"])
+
+    ingest_meteo_data() >> transform_meteo_data() >> finalize_meteo_load()
+
+
+dag = meteo_dag()

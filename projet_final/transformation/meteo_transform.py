@@ -30,8 +30,8 @@ def main():
 
     config.set_string(
         "pipeline.jars",
-        "file:///opt/flink/lib/flink-connector-jdbc-3.1.2-1.17.jar;"
-        "file:///opt/flink/lib/postgresql-42.7.3.jar"
+        "file:///opt/airflow/jars/flink-connector-jdbc-3.1.2-1.17.jar;"
+        "file:///opt/airflow/jars/postgresql-42.7.3.jar"
     )
 
     print("JARS =", config.get_string("pipeline.jars", "NOT SET"))

@@ -17,7 +17,7 @@ SPARK_CONFIG = {
     "log_level": "WARN",
 }
 
-OUTPUT_TABLE = "analytics.fact_taxi_trips"
+OUTPUT_TABLE = "processed_zone.fact_taxi_trips"
 
 # Session Spark
 def get_spark_session(config):
@@ -38,9 +38,9 @@ def read_source_data(spark):
 
     # Chemins des fichiers
     data_paths = [
-        "/projet_final/ingestion/yellow_taxi_nyc/yellow_tripdata_2026-01.parquet", 
-        "/projet_final/ingestion/yellow_taxi_nyc/yellow_tripdata_2026-02.parquet", 
-        "/projet_final/ingestion/yellow_taxi_nyc/yellow_tripdata_2026-03.parquet"
+        "/opt/airflow/dags/projet_final/ingestion/yellow_taxi_nyc/yellow_tripdata_2026-01.parquet",
+        "/opt/airflow/dags/projet_final/ingestion/yellow_taxi_nyc/yellow_tripdata_2026-02.parquet",
+        "/opt/airflow/dags/projet_final/ingestion/yellow_taxi_nyc/yellow_tripdata_2026-03.parquet"
     ]
 
     df = spark.read.parquet(*data_paths)

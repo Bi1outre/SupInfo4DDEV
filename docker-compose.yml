@@ -54,7 +54,7 @@ services:
       - airflow-db
       - postgres
     environment:
-      AIRFLOW_HOME: /opt/airflow
+      AIRFLOW_HOME: /opt/airflow/home
       AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
       AIRFLOW__CORE__EXECUTE_TASKS_NEW_PYTHON_INTERPRETER: "true"
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
@@ -65,8 +65,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./projet_final/airflow/home:/opt/airflow
-      - ./projet_final/airflow/logs:/opt/airflow/logs
+      - ./projet_final/airflow/home:/opt/airflow/home
+      - ./projet_final/airflow/logs:/opt/airflow/home/logs
       - ./projet_final:/opt/airflow/dags/projet_final
       - ./projet_final/ingestion:/opt/airflow/dags/projet_final/ingestion
       - ./projet_final/transformation:/opt/airflow/dags/projet_final/transformation
@@ -74,8 +74,8 @@ services:
       - data-pipeline
     command: >
       bash -c "
-      mkdir -p /opt/airflow/logs &&
-      chmod -R 777 /opt/airflow/logs &&
+      mkdir -p /opt/airflow/home/logs &&
+      chmod -R 777 /opt/airflow/home/logs &&
       airflow db init &&
       airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com &&
       airflow webserver -p 8080
@@ -97,14 +97,14 @@ services:
     depends_on:
       - airflow-db
     environment:
-      AIRFLOW_HOME: /opt/airflow
+      AIRFLOW_HOME: /opt/airflow/home
       AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW_CONN_POSTGRES_DWH: postgresql://postgres:postgres@postgres:5432/mobility_and_meteo
     volumes:
-      - ./projet_final/airflow/home:/opt/airflow
-      - ./projet_final/airflow/logs:/opt/airflow/logs
+      - ./projet_final/airflow/home:/opt/airflow/home
+      - ./projet_final/airflow/logs:/opt/airflow/home/logs
       - ./projet_final:/opt/airflow/dags/projet_final
       - ./projet_final/ingestion:/opt/airflow/dags/projet_final/ingestion
       - ./projet_final/transformation:/opt/airflow/dags/projet_final/transformation
@@ -112,29 +112,10 @@ services:
       - data-pipeline
     command: >
       bash -c "
-      mkdir -p /opt/airflow/logs &&
-      chmod -R 777 /opt/airflow/logs &&
+      mkdir -p /opt/airflow/home/logs &&
+      chmod -R 777 /opt/airflow/home/logs &&
       airflow scheduler
       "
-
-  # =====================================================
-  # JUPYTER - Interactive Notebook 
-  # =====================================================
-  jupyter:
-    image: jupyter/pyspark-notebook:latest
-    container_name: jupyter_notebook
-    depends_on:
-      - postgres
-    environment:
-      GRANT_SUDO: "yes"
-    ports:
-      - "8888:8888"
-    volumes:
-      - jupyter_home:/home/jovyan/work
-      - ./projet_final:/home/jovyan/work/projet_final
-    networks:
-      - data-pipeline
-    command: start-notebook.sh --NotebookApp.token="" --NotebookApp.password=""
 
   # =====================================================
   # DBT - Data Transformation (avec dbt-postgres)
@@ -177,7 +158,6 @@ services:
 volumes:
   postgres_data:
   airflow_db:
-  jupyter_home:
   pgadmin_data:
 
 networks:

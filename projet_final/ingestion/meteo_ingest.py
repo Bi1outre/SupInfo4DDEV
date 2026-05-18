@@ -7,7 +7,7 @@ import os
 BASE_DIR = "/opt/airflow/dags/projet_final"
 
 def main():
-    OUTPUT_DIR = os.path.join(BASE_DIR, "output", "meteo_nyc")
+    OUTPUT_DIR = os.path.join(BASE_DIR, "ingestion", "meteo_nyc")
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
